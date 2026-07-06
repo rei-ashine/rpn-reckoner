@@ -3,25 +3,25 @@
 //! # Example1
 //! ```
 //! let expression = String::from("1 2 +");
-//! let solution = rpn_reckoner::eval(expression).unwrap();
+//! let solution = rpn_reckoner::eval(&expression).unwrap();
 //! println!("{}", solution); // -> 3
 //! ```
 //! # Example2
 //! ```
 //! let expression = String::from("5 2 - 3 +");
-//! let solution = rpn_reckoner::eval(expression).unwrap();
+//! let solution = rpn_reckoner::eval(&expression).unwrap();
 //! println!("{}", solution); // -> 6
 //! ```
 //! # Example3
 //! ```
 //! let expression = String::from("5 2 3 ^ +");
-//! let solution = rpn_reckoner::eval(expression).unwrap();
+//! let solution = rpn_reckoner::eval(&expression).unwrap();
 //! println!("{}", solution); // -> 13
 //! ```
 //! # Example4
 //! ```
 //! let expression = String::from("4 ! 2 +");
-//! let solution = rpn_reckoner::eval(expression).unwrap();
+//! let solution = rpn_reckoner::eval(&expression).unwrap();
 //! println!("{}", solution); // -> 26
 //! ```
 
@@ -29,14 +29,14 @@ mod operation;
 
 
 /// The function computes RPN expressions
-pub fn eval(expression: String) -> Result<f64, String> {
+pub fn eval(expression: &str) -> Result<f64, String> {
     // Separate tokens with white space
     let tokens = expression.split_whitespace();
 
     let mut stack: Vec<f64> = Vec::new();
     for token in tokens {
         let t = token.trim();
-        if t == "" { continue; }
+        if t.is_empty() { continue; }
 
         // Push values onto the stack
         if let Ok(value) = t.parse::<f64>() {
@@ -79,8 +79,8 @@ pub fn eval(expression: String) -> Result<f64, String> {
         }
     }
 
-    if stack.len() == 0 { return Err(format!("[Error] No result.")); }
-    if stack.len() > 1 { return Err(format!("[Error] Too many values in the stack.")); }
+    if stack.is_empty() { return Err("[Error] No result.".to_string()); }
+    if stack.len() > 1 { return Err("[Error] Too many values in the stack.".to_string()); }
 
     Ok(stack.pop().unwrap_or(0.0))
 }

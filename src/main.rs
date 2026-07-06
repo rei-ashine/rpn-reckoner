@@ -3,11 +3,11 @@ use std::io::{ self, Write };
 
 
 fn main() -> Result<(), std::io::Error> {
-    println!("");
+    println!();
     println!("#########################################");
     println!("#### Reverse Polish Notation Reckoner ###");
     println!("#########################################");
-    println!("");
+    println!();
 
     // ASCII art (Font: colossal)
     println!("8888888b.      8888888b.      888b    888");
@@ -18,11 +18,11 @@ fn main() -> Result<(), std::io::Error> {
     println!("888 T88b       888            888  Y88888");
     println!("888  T88b      888            888   Y8888");
     println!("888   T88b     888            888    Y888");
-    println!("");
+    println!();
 
     println!("#########################################");
     println!("Type: q<Enter> to exit.");
-    println!("");
+    println!();
 
     loop {
         print!("\n🚀 RPN > ");
@@ -34,7 +34,7 @@ fn main() -> Result<(), std::io::Error> {
 
         if expression.trim() == "q" { break; }
 
-        let solution = rpn_reckoner::eval(expression);
+        let solution = rpn_reckoner::eval(&expression);
 
         match solution {
             Err(e) => println!("\n👻 {}", e),
