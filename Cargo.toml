@@ -1,13 +1,13 @@
 [package]
 name = "rpn-reckoner"
-version = "0.1.3"
+version = "1.0.0"
 edition = "2021"
-authors = ["Rei-Ashine"]
+authors = ["rei-ashine"]
 description = "A Reverse Polish Notation library"
 license = "MIT"
 include = ["src/", "README.md"]
-homepage = "https://github.com/Rei-Ashine"
-repository = "https://github.com/Rei-Ashine/rpn-reckoner"
+homepage = "https://github.com/rei-ashine"
+repository = "https://github.com/rei-ashine/rpn-reckoner"
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--cfg", "doc_cfg"]
