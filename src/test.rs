@@ -23,5 +23,14 @@ mod tests {
         assert_eq!(eval("a + 2".to_string()), Err("[Error] Invalid operator: a".to_string()));
         assert_eq!(eval("".to_string()), Err("[Error] No result.".to_string()));
         assert_eq!(eval("1 2 3".to_string()), Err("[Error] Too many values in the stack.".to_string()));
+
+        // Added error edge cases
+        assert_eq!(eval("+".to_string()), Err("[Error] Not enough operands for operator '+'".to_string()));
+        assert_eq!(eval("1 +".to_string()), Err("[Error] Not enough operands for operator '+'".to_string()));
+        assert_eq!(eval("!".to_string()), Err("[Error] Not enough operands for operator '!'".to_string()));
+
+        // Added bugfix test cases
+        assert_eq!(eval("0 4 !".to_string()), Err("[Error] Too many values in the stack.".to_string()));
+        assert_eq!(eval("0 !".to_string()), Ok(1.0));
     }
 }

@@ -2,7 +2,6 @@ pub fn factorial(n: f64) -> f64 {
     let n = n.round() as usize;
 
     if n == 0 {return 1.0;}
-    else if n < 1 { return 0.0; }
 
     (1..=n).fold(1.0, |acc, value| acc * value as f64)
 }

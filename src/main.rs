@@ -29,7 +29,8 @@ fn main() -> Result<(), std::io::Error> {
         io::stdout().flush()?;
         let mut expression = String::new();
 
-        io::stdin().read_line(&mut expression)?;
+        let bytes_read = io::stdin().read_line(&mut expression)?;
+        if bytes_read == 0 { break; }
 
         if expression.trim() == "q" { break; }
 

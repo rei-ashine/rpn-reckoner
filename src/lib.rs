@@ -39,30 +39,40 @@ pub fn eval(expression: String) -> Result<f64, String> {
         if t == "" { continue; }
 
         // Push values onto the stack
-        match t.parse::<f64>() {
-            Ok(value) => { stack.push(value); continue; },
-            Err(_) => 0.0,
-        };
+        if let Ok(value) = t.parse::<f64>() {
+            stack.push(value);
+            continue;
+        }
 
         // Push calculation results onto the stack
-        let right = stack.pop().unwrap_or(0.0);
-        let left = stack.pop().unwrap_or(0.0);
         match t {
-            // Operator
-            "+" => stack.push(left + right),
-            "-" => stack.push(left - right),
-            "*" => stack.push(left * right),
-            "/" => stack.push(left / right),
-            "%" => stack.push(left % right),
+            // Binary Operator
+            "+" | "-" | "*" | "/" | "%" | "^" | "**" => {
+                if stack.len() < 2 {
+                    return Err(format!("[Error] Not enough operands for operator '{}'", t));
+                }
+                let right = stack.pop().unwrap();
+                let left = stack.pop().unwrap();
+                let result = match t {
+                    "+" => left + right,
+                    "-" => left - right,
+                    "*" => left * right,
+                    "/" => left / right,
+                    "%" => left % right,
+                    "^" | "**" => left.powf(right),
+                    _ => unreachable!(),
+                };
+                stack.push(result);
+            },
 
-            // Power
-            "^" => stack.push(left.powf(right)),
-            "**" => stack.push(left.powf(right)),
-
-            // Factorial
+            // Unary Operator (Factorial)
             "!" => {
-                if left != 0.0 { stack.push(left); }
-                stack.push(operation::factorial(right)); },
+                if stack.is_empty() {
+                    return Err(format!("[Error] Not enough operands for operator '{}'", t));
+                }
+                let value = stack.pop().unwrap();
+                stack.push(operation::factorial(value));
+            },
 
             // Error
             _ => return Err(format!("[Error] Invalid operator: {}", t)),
