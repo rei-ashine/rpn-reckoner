@@ -1,7 +1,7 @@
 [package]
 name = "rpn-reckoner"
 version = "1.0.0"
-edition = "2021"
+edition = "2024"
 authors = ["rei-ashine"]
 description = "A Reverse Polish Notation library"
 license = "MIT"
