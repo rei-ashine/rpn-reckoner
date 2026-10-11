@@ -1,4 +1,4 @@
-use crate::eval;
+use crate::{Error, eval};
 
 #[test]
 fn test_binary_operators() {
@@ -44,31 +44,36 @@ fn test_white_space() {
 
 #[test]
 fn test_errors() {
-    assert_eq!(
-        eval("a + 2"),
-        Err("[Error] Invalid operator: a".to_string())
-    );
-    assert_eq!(eval(""), Err("[Error] No result.".to_string()));
-    assert_eq!(
-        eval("1 2 3"),
-        Err("[Error] Too many values in the stack.".to_string())
-    );
+    assert_eq!(eval("a + 2"), Err(Error::InvalidToken("a".to_string())));
+    assert_eq!(eval(""), Err(Error::NoResult));
+    assert_eq!(eval("1 2 3"), Err(Error::TooManyValues));
 
-    assert_eq!(
-        eval("+"),
-        Err("[Error] Not enough operands for operator '+'".to_string())
-    );
-    assert_eq!(
-        eval("1 +"),
-        Err("[Error] Not enough operands for operator '+'".to_string())
-    );
-    assert_eq!(
-        eval("!"),
-        Err("[Error] Not enough operands for operator '!'".to_string())
-    );
+    assert_eq!(eval("+"), Err(not_enough_operands("+")));
+    assert_eq!(eval("1 +"), Err(not_enough_operands("+")));
+    assert_eq!(eval("!"), Err(not_enough_operands("!")));
 
+    assert_eq!(eval("0 4 !"), Err(Error::TooManyValues));
+}
+
+#[test]
+fn test_error_messages() {
     assert_eq!(
-        eval("0 4 !"),
-        Err("[Error] Too many values in the stack.".to_string())
+        not_enough_operands("+").to_string(),
+        "Not enough operands for operator '+'"
     );
+    assert_eq!(
+        Error::InvalidToken("a".to_string()).to_string(),
+        "Invalid operator: a"
+    );
+    assert_eq!(Error::NoResult.to_string(), "No result.");
+    assert_eq!(
+        Error::TooManyValues.to_string(),
+        "Too many values in the stack."
+    );
+}
+
+fn not_enough_operands(operator: &str) -> Error {
+    Error::NotEnoughOperands {
+        operator: operator.to_string(),
+    }
 }

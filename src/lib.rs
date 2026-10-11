@@ -21,7 +21,10 @@
 //! assert_eq!(solution, 26.0);
 //! ```
 
+mod error;
 mod operation;
+
+pub use error::Error;
 
 /// Evaluates an RPN expression and returns its value.
 ///
@@ -31,13 +34,12 @@ mod operation;
 ///
 /// # Errors
 ///
-/// Returns an error message when:
-/// - an operator does not have enough operands:
-///   `"[Error] Not enough operands for operator '<operator>'"`
-/// - a token is neither a number nor an operator: `"[Error] Invalid operator: <token>"`
-/// - no value is left on the stack: `"[Error] No result."`
-/// - more than one value is left on the stack: `"[Error] Too many values in the stack."`
-pub fn eval(expression: &str) -> Result<f64, String> {
+/// Returns an [`Error`] when:
+/// - an operator does not have enough operands: [`Error::NotEnoughOperands`]
+/// - a token is neither a number nor an operator: [`Error::InvalidToken`]
+/// - no value is left on the stack: [`Error::NoResult`]
+/// - more than one value is left on the stack: [`Error::TooManyValues`]
+pub fn eval(expression: &str) -> Result<f64, Error> {
     let mut stack: Vec<f64> = Vec::new();
 
     // Separate tokens with white space
@@ -52,20 +54,20 @@ pub fn eval(expression: &str) -> Result<f64, String> {
         if token == "!" {
             // Unary Operator (Factorial)
             let Some(value) = stack.pop() else {
-                return Err(format!(
-                    "[Error] Not enough operands for operator '{token}'"
-                ));
+                return Err(Error::NotEnoughOperands {
+                    operator: token.to_string(),
+                });
             };
             stack.push(operation::factorial(value));
         } else {
             // Binary Operator
             let Some(operator) = operation::binary_operator(token) else {
-                return Err(format!("[Error] Invalid operator: {token}"));
+                return Err(Error::InvalidToken(token.to_string()));
             };
             let (Some(right), Some(left)) = (stack.pop(), stack.pop()) else {
-                return Err(format!(
-                    "[Error] Not enough operands for operator '{token}'"
-                ));
+                return Err(Error::NotEnoughOperands {
+                    operator: token.to_string(),
+                });
             };
             stack.push(operator(left, right));
         }
@@ -73,9 +75,9 @@ pub fn eval(expression: &str) -> Result<f64, String> {
 
     // Exactly one value must remain on the stack
     match stack.as_slice() {
-        [] => Err("[Error] No result.".to_string()),
+        [] => Err(Error::NoResult),
         [value] => Ok(*value),
-        _ => Err("[Error] Too many values in the stack.".to_string()),
+        _ => Err(Error::TooManyValues),
     }
 }
 
