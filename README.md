@@ -18,12 +18,11 @@ either the evaluated value as a float or an error message as a string.
 cargo add rpn_reckoner
 ```
 
+This package uses Rust 2024 edition, so Rust 1.85 or later is required.
+
 ### Example1
 
 ```rust
-extern crate rpn_reckoner;
-
-
 fn main() {
     let expression = String::from("3 2 +");
     let solution = rpn_reckoner::eval(&expression).unwrap();
@@ -34,9 +33,6 @@ fn main() {
 ### Example2
 
 ```rust
-extern crate rpn_reckoner;
-
-
 fn main() {
     let expression = String::from("6 4 ! +");
     let solution = rpn_reckoner::eval(&expression).unwrap();

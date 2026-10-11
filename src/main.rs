@@ -1,4 +1,3 @@
-extern crate rpn_reckoner;
 use std::io::{ self, Write };
 
 

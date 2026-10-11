@@ -79,10 +79,12 @@ pub fn eval(expression: &str) -> Result<f64, String> {
         }
     }
 
-    if stack.is_empty() { return Err("[Error] No result.".to_string()); }
-    if stack.len() > 1 { return Err("[Error] Too many values in the stack.".to_string()); }
-
-    Ok(stack.pop().unwrap_or(0.0))
+    // Exactly one value must remain on the stack
+    match stack.as_slice() {
+        [] => Err("[Error] No result.".to_string()),
+        [value] => Ok(*value),
+        _ => Err("[Error] Too many values in the stack.".to_string()),
+    }
 }
 
 
