@@ -2,80 +2,69 @@
 //! Reverse Polish Notation (: RPN) - Reckoner
 //! # Example1
 //! ```
-//! let expression = String::from("1 2 +");
-//! let solution = rpn_reckoner::eval(&expression).unwrap();
-//! println!("{}", solution); // -> 3
+//! let solution = rpn_reckoner::eval("1 2 +").unwrap();
+//! assert_eq!(solution, 3.0);
 //! ```
 //! # Example2
 //! ```
-//! let expression = String::from("5 2 - 3 +");
-//! let solution = rpn_reckoner::eval(&expression).unwrap();
-//! println!("{}", solution); // -> 6
+//! let solution = rpn_reckoner::eval("5 2 - 3 +").unwrap();
+//! assert_eq!(solution, 6.0);
 //! ```
 //! # Example3
 //! ```
-//! let expression = String::from("5 2 3 ^ +");
-//! let solution = rpn_reckoner::eval(&expression).unwrap();
-//! println!("{}", solution); // -> 13
+//! let solution = rpn_reckoner::eval("5 2 3 ^ +").unwrap();
+//! assert_eq!(solution, 13.0);
 //! ```
 //! # Example4
 //! ```
-//! let expression = String::from("4 ! 2 +");
-//! let solution = rpn_reckoner::eval(&expression).unwrap();
-//! println!("{}", solution); // -> 26
+//! let solution = rpn_reckoner::eval("4 ! 2 +").unwrap();
+//! assert_eq!(solution, 26.0);
 //! ```
 
 mod operation;
 
 
-/// The function computes RPN expressions
+/// Evaluates an RPN expression and returns its value.
+///
+/// Tokens are separated by white space. Each token is either a number
+/// (anything `str::parse::<f64>` accepts, e.g. `-3`, `2.5`, `1e3`)
+/// or one of the operators `+`, `-`, `*`, `/`, `%`, `^` (or `**`) and `!` (factorial).
+///
+/// # Errors
+///
+/// Returns an error message when:
+/// - an operator does not have enough operands:
+///   `"[Error] Not enough operands for operator '<operator>'"`
+/// - a token is neither a number nor an operator: `"[Error] Invalid operator: <token>"`
+/// - no value is left on the stack: `"[Error] No result."`
+/// - more than one value is left on the stack: `"[Error] Too many values in the stack."`
 pub fn eval(expression: &str) -> Result<f64, String> {
-    // Separate tokens with white space
-    let tokens = expression.split_whitespace();
-
     let mut stack: Vec<f64> = Vec::new();
-    for token in tokens {
-        let t = token.trim();
-        if t.is_empty() { continue; }
 
+    // Separate tokens with white space
+    for token in expression.split_whitespace() {
         // Push values onto the stack
-        if let Ok(value) = t.parse::<f64>() {
+        if let Ok(value) = token.parse::<f64>() {
             stack.push(value);
             continue;
         }
 
         // Push calculation results onto the stack
-        match t {
-            // Binary Operator
-            "+" | "-" | "*" | "/" | "%" | "^" | "**" => {
-                if stack.len() < 2 {
-                    return Err(format!("[Error] Not enough operands for operator '{}'", t));
-                }
-                let right = stack.pop().unwrap();
-                let left = stack.pop().unwrap();
-                let result = match t {
-                    "+" => left + right,
-                    "-" => left - right,
-                    "*" => left * right,
-                    "/" => left / right,
-                    "%" => left % right,
-                    "^" | "**" => left.powf(right),
-                    _ => unreachable!(),
-                };
-                stack.push(result);
-            },
-
+        if token == "!" {
             // Unary Operator (Factorial)
-            "!" => {
-                if stack.is_empty() {
-                    return Err(format!("[Error] Not enough operands for operator '{}'", t));
-                }
-                let value = stack.pop().unwrap();
-                stack.push(operation::factorial(value));
-            },
-
-            // Error
-            _ => return Err(format!("[Error] Invalid operator: {}", t)),
+            let Some(value) = stack.pop() else {
+                return Err(format!("[Error] Not enough operands for operator '{token}'"));
+            };
+            stack.push(operation::factorial(value));
+        } else {
+            // Binary Operator
+            let Some(operator) = operation::binary_operator(token) else {
+                return Err(format!("[Error] Invalid operator: {token}"));
+            };
+            let (Some(right), Some(left)) = (stack.pop(), stack.pop()) else {
+                return Err(format!("[Error] Not enough operands for operator '{token}'"));
+            };
+            stack.push(operator(left, right));
         }
     }
 
@@ -88,4 +77,5 @@ pub fn eval(expression: &str) -> Result<f64, String> {
 }
 
 
+#[cfg(test)]
 mod test;

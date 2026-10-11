@@ -1,3 +1,18 @@
+/// Returns the function for a binary operator token, or `None` if the token is not one
+pub fn binary_operator(token: &str) -> Option<fn(f64, f64) -> f64> {
+    let operator: fn(f64, f64) -> f64 = match token {
+        "+" => |left, right| left + right,
+        "-" => |left, right| left - right,
+        "*" => |left, right| left * right,
+        "/" => |left, right| left / right,
+        "%" => |left, right| left % right,
+        "^" | "**" => f64::powf,
+        _ => return None,
+    };
+    Some(operator)
+}
+
+
 pub fn factorial(n: f64) -> f64 {
     if n < 0.0 || n.is_nan() {
         return f64::NAN;

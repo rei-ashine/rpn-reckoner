@@ -7,8 +7,9 @@ authors = ["rei-ashine"]
 description = "A Reverse Polish Notation library"
 license = "MIT"
 include = ["src/", "README.md", "LICENSE"]
-homepage = "https://github.com/rei-ashine"
 repository = "https://github.com/rei-ashine/rpn-reckoner"
+keywords = ["rpn", "reverse-polish", "postfix", "calculator", "repl"]
+categories = ["command-line-utilities"]
 
 [[bin]]
 name = "rpn-reckoner"
