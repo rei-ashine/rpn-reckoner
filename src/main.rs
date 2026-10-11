@@ -36,9 +36,37 @@ fn main() -> Result<(), std::io::Error> {
         let solution = rpn_reckoner::eval(&expression);
 
         match solution {
-            Err(e) => println!("\n👻 {}", e),
-            Ok(r) => println!("\n✅ {}", r),
+            Err(e) => println!("\n👻 {e}"),
+            Ok(r) => println!("\n✅ {}", format_number(r)),
         }
     }
     Ok(())
+}
+
+
+/// Formats a result, using exponent notation for magnitudes too large to show exactly
+fn format_number(value: f64) -> String {
+    if value.is_finite() && value.abs() >= 1e16 {
+        format!("{value:e}")
+    } else {
+        value.to_string()
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::format_number;
+
+    #[test]
+    fn test_format_number() {
+        assert_eq!(format_number(3.0), "3");
+        assert_eq!(format_number(-0.0), "-0");
+        assert_eq!(format_number(1e-7), "0.0000001");
+        assert_eq!(format_number(9_999_999_999_999_998.0), "9999999999999998");
+        assert_eq!(format_number(1e16), "1e16");
+        assert_eq!(format_number(-2.5e20), "-2.5e20");
+        assert_eq!(format_number(f64::INFINITY), "inf");
+        assert_eq!(format_number(f64::NAN), "NaN");
+    }
 }

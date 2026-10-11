@@ -15,7 +15,7 @@ either the evaluated value as a float or an error message as a string.
 ## Installation
 
 ```bash
-cargo add rpn_reckoner
+cargo add rpn-reckoner
 ```
 
 This package uses Rust 2024 edition, so Rust 1.85 or later is required.
@@ -24,8 +24,7 @@ This package uses Rust 2024 edition, so Rust 1.85 or later is required.
 
 ```rust
 fn main() {
-    let expression = String::from("3 2 +");
-    let solution = rpn_reckoner::eval(&expression).unwrap();
+    let solution = rpn_reckoner::eval("3 2 +").unwrap();
     println!("{}", solution); // -> 5
 }
 ```
@@ -34,20 +33,27 @@ fn main() {
 
 ```rust
 fn main() {
-    let expression = String::from("6 4 ! +");
-    let solution = rpn_reckoner::eval(&expression).unwrap();
+    let solution = rpn_reckoner::eval("6 4 ! +").unwrap();
     println!("{}", solution); // -> 30
 }
 ```
 
 ## Read-Eval-Print Loop (: REPL)
 
+The REPL can be installed from crates.io and started with the `rpn-reckoner` command.
+
 ```bash
-git clone https://github.com/Rei-Ashine/rpn-reckoner.git
+cargo install rpn-reckoner
+rpn-reckoner
 ```
 
-To start the REPL for evaluating RPN expressions,  
-the command `cargo run` should be run in the terminal.
+Alternatively, clone this repository and run the command `cargo run` in the terminal.
+
+```bash
+git clone https://github.com/Rei-Ashine/rpn-reckoner.git
+cd rpn-reckoner
+cargo run
+```
 
 ![REPL](./PNG/RPN-Reckoner_REPL.png)
 
@@ -55,9 +61,15 @@ the command `cargo run` should be run in the terminal.
 
 ```text
 .
+├── .github
+│   └── workflows
+│       └── ci.yml
 ├── README.md
 ├── Cargo.toml
 ├── LICENSE
+├── PNG
+│   ├── RPN-Reckoner_20230208.png
+│   └── RPN-Reckoner_REPL.png
 └── src
     ├── lib.rs
     ├── main.rs
@@ -71,18 +83,18 @@ the command `cargo run` should be run in the terminal.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  Language              Files        Lines         Code     Comments       Blanks
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- TOML                      1           16           15            0            1
+ TOML                      1           17           16            0            1
 ─────────────────────────────────────────────────────────────────────────────────
- Markdown                  1           85            0           61           24
- |- BASH                   1            2            2            0            0
- |- Rust                   1           10           10            0            0
- (Total)                               97           12           61           24
+ Markdown                  1           95            0           69           26
+ |- BASH                   1            6            6            0            0
+ |- Rust                   1            8            8            0            0
+ (Total)                              109           14           69           26
 ─────────────────────────────────────────────────────────────────────────────────
- Rust                      4          177          134           10           33
- |- Markdown               1           27            0           27            0
- (Total)                              204          134           37           33
+ Rust                      4          219          171            7           41
+ |- Markdown               3           38            0           35            3
+ (Total)                              257          171           42           44
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Total                     6          317          161           98           58
+ Total                     6          383          201          111           71
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
