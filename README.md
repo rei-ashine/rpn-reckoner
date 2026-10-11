@@ -57,10 +57,27 @@ cargo run
 
 ![REPL](./PNG/RPN-Reckoner_REPL.png)
 
+## Development
+
+CI runs the following checks on every pull request.
+Clippy, rustfmt and rustdoc use a pinned Rust toolchain,
+set by `RUST_LINT_TOOLCHAIN` in `.github/workflows/ci.yml` (currently 1.99).
+
+```bash
+cargo test
+cargo +1.99 clippy --all-targets -- -D warnings
+cargo +1.99 fmt --check
+RUSTDOCFLAGS="-D warnings" cargo +1.99 doc --no-deps
+```
+
+To move to a newer toolchain, update `RUST_LINT_TOOLCHAIN`,
+run the commands above with the new version, and fix any new findings in the same pull request.
+
 ## Directory Structure
 
 ```text
 .
+├── .git-blame-ignore-revs
 ├── .github
 │   └── workflows
 │       └── ci.yml
@@ -85,16 +102,16 @@ cargo run
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  TOML                      1           17           16            0            1
 ─────────────────────────────────────────────────────────────────────────────────
- Markdown                  1           95            0           69           26
- |- BASH                   1            6            6            0            0
+ Markdown                  1          108            0           78           30
+ |- BASH                   1           10           10            0            0
  |- Rust                   1            8            8            0            0
- (Total)                              109           14           69           26
+ (Total)                              126           18           78           30
 ─────────────────────────────────────────────────────────────────────────────────
- Rust                      4          219          171            7           41
+ Rust                      4          239          199            7           33
  |- Markdown               3           38            0           35            3
- (Total)                              257          171           42           44
+ (Total)                              277          199           42           36
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Total                     6          383          201          111           71
+ Total                     6          420          233          120           67
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
