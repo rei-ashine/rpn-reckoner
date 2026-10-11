@@ -28,15 +28,19 @@ pub use error::Error;
 
 /// Evaluates an RPN expression and returns its value.
 ///
-/// Tokens are separated by white space. Each token is either a number
-/// (anything `str::parse::<f64>` accepts, e.g. `-3`, `2.5`, `1e3`)
+/// Tokens are separated by white space. Each token is either a finite number
+/// (anything `str::parse::<f64>` accepts that is finite, e.g. `-3`, `2.5`, `1e3`)
 /// or one of the operators `+`, `-`, `*`, `/`, `%`, `^` (or `**`) and `!` (factorial).
+/// Every intermediate result must be finite as well, so the returned value is always finite.
 ///
 /// # Errors
 ///
 /// Returns an [`Error`] when:
 /// - an operator does not have enough operands: [`Error::NotEnoughOperands`]
 /// - a token is neither a number nor an operator: [`Error::InvalidToken`]
+/// - a number is not finite (`inf`, `nan`, `1e400`, ...): [`Error::NonFiniteNumber`]
+/// - an operator produces a value that is not finite
+///   (division by zero, NaN, overflow): [`Error::NonFiniteResult`]
 /// - no value is left on the stack: [`Error::NoResult`]
 /// - more than one value is left on the stack: [`Error::TooManyValues`]
 pub fn eval(expression: &str) -> Result<f64, Error> {
@@ -46,6 +50,9 @@ pub fn eval(expression: &str) -> Result<f64, Error> {
     for token in expression.split_whitespace() {
         // Push values onto the stack
         if let Ok(value) = token.parse::<f64>() {
+            if !value.is_finite() {
+                return Err(Error::NonFiniteNumber(token.to_string()));
+            }
             stack.push(value);
             continue;
         }
@@ -58,7 +65,7 @@ pub fn eval(expression: &str) -> Result<f64, Error> {
                     operator: token.to_string(),
                 });
             };
-            stack.push(operation::factorial(value));
+            stack.push(finite(operation::factorial(value), token)?);
         } else {
             // Binary Operator
             let Some(operator) = operation::binary_operator(token) else {
@@ -69,7 +76,7 @@ pub fn eval(expression: &str) -> Result<f64, Error> {
                     operator: token.to_string(),
                 });
             };
-            stack.push(operator(left, right));
+            stack.push(finite(operator(left, right), token)?);
         }
     }
 
@@ -78,6 +85,17 @@ pub fn eval(expression: &str) -> Result<f64, Error> {
         [] => Err(Error::NoResult),
         [value] => Ok(*value),
         _ => Err(Error::TooManyValues),
+    }
+}
+
+/// Returns `value` if it is finite, otherwise an error naming the operator that produced it
+fn finite(value: f64, operator: &str) -> Result<f64, Error> {
+    if value.is_finite() {
+        Ok(value)
+    } else {
+        Err(Error::NonFiniteResult {
+            operator: operator.to_string(),
+        })
     }
 }
 

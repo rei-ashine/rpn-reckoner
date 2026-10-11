@@ -14,6 +14,14 @@ pub enum Error {
     },
     /// A token was neither a number nor a known operator.
     InvalidToken(String),
+    /// A number token was not finite, e.g. `inf`, `nan` or `1e400`.
+    NonFiniteNumber(String),
+    /// An operator produced a value that is not finite,
+    /// e.g. division by zero, `0 0 /` (NaN) or an overflow.
+    NonFiniteResult {
+        /// The operator token, e.g. `"/"`.
+        operator: String,
+    },
     /// No value was left on the stack, e.g. for an empty expression.
     NoResult,
     /// More than one value was left on the stack.
@@ -27,6 +35,10 @@ impl fmt::Display for Error {
                 write!(f, "Not enough operands for operator '{operator}'")
             }
             Error::InvalidToken(token) => write!(f, "Invalid operator: {token}"),
+            Error::NonFiniteNumber(token) => write!(f, "Not a finite number: {token}"),
+            Error::NonFiniteResult { operator } => {
+                write!(f, "Result of operator '{operator}' is not a finite number")
+            }
             Error::NoResult => write!(f, "No result."),
             Error::TooManyValues => write!(f, "Too many values in the stack."),
         }

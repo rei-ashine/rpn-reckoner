@@ -19,7 +19,6 @@ fn test_factorial_operator() {
     assert_eq!(eval("6 4 ! +"), Ok(30.0));
 
     assert_eq!(eval("0 !"), Ok(1.0));
-    assert_eq!(eval("inf !"), Ok(f64::INFINITY));
 }
 
 #[test]
@@ -56,6 +55,37 @@ fn test_errors() {
 }
 
 #[test]
+fn test_non_finite() {
+    // Non-finite numbers are rejected as input
+    for token in ["inf", "-inf", "+inf", "infinity", "nan", "NaN", "1e400"] {
+        assert_eq!(
+            eval(token),
+            Err(Error::NonFiniteNumber(token.to_string())),
+            "{token}"
+        );
+    }
+    assert_eq!(
+        eval("inf !"),
+        Err(Error::NonFiniteNumber("inf".to_string()))
+    );
+
+    // Non-finite results are errors, wherever they occur
+    assert_eq!(eval("1 0 /"), Err(non_finite_result("/")));
+    assert_eq!(eval("-1 0 /"), Err(non_finite_result("/")));
+    assert_eq!(eval("0 0 /"), Err(non_finite_result("/")));
+    assert_eq!(eval("5 0 %"), Err(non_finite_result("%")));
+    assert_eq!(eval("-8 0.333 ^"), Err(non_finite_result("^")));
+    assert_eq!(eval("1e308 10 *"), Err(non_finite_result("*")));
+    assert_eq!(eval("1 0 / -1 ^"), Err(non_finite_result("/")));
+    assert_eq!(eval("1 0 / x"), Err(non_finite_result("/")));
+    assert_eq!(eval("171 !"), Err(non_finite_result("!")));
+
+    // Large but finite values are still fine
+    assert_eq!(eval("1e308"), Ok(1e308));
+    assert!(eval("170 !").is_ok_and(f64::is_finite));
+}
+
+#[test]
 fn test_error_messages() {
     assert_eq!(
         not_enough_operands("+").to_string(),
@@ -64,6 +94,14 @@ fn test_error_messages() {
     assert_eq!(
         Error::InvalidToken("a".to_string()).to_string(),
         "Invalid operator: a"
+    );
+    assert_eq!(
+        Error::NonFiniteNumber("inf".to_string()).to_string(),
+        "Not a finite number: inf"
+    );
+    assert_eq!(
+        non_finite_result("/").to_string(),
+        "Result of operator '/' is not a finite number"
     );
     assert_eq!(Error::NoResult.to_string(), "No result.");
     assert_eq!(
@@ -74,6 +112,12 @@ fn test_error_messages() {
 
 fn not_enough_operands(operator: &str) -> Error {
     Error::NotEnoughOperands {
+        operator: operator.to_string(),
+    }
+}
+
+fn non_finite_result(operator: &str) -> Error {
+    Error::NonFiniteResult {
         operator: operator.to_string(),
     }
 }
