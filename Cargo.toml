@@ -2,15 +2,13 @@
 name = "rpn-reckoner"
 version = "1.0.0"
 edition = "2024"
+rust-version = "1.85"
 authors = ["rei-ashine"]
 description = "A Reverse Polish Notation library"
 license = "MIT"
-include = ["src/", "README.md"]
+include = ["src/", "README.md", "LICENSE"]
 homepage = "https://github.com/rei-ashine"
 repository = "https://github.com/rei-ashine/rpn-reckoner"
-
-[package.metadata.docs.rs]
-rustdoc-args = ["--cfg", "doc_cfg"]
 
 [[bin]]
 name = "rpn-reckoner"

@@ -32,6 +32,6 @@ mod tests {
         // Added bugfix test cases
         assert_eq!(eval("0 4 !"), Err("[Error] Too many values in the stack.".to_string()));
         assert_eq!(eval("0 !"), Ok(1.0));
-        assert_eq!(eval("inf !"), Ok(std::f64::INFINITY));
+        assert_eq!(eval("inf !"), Ok(f64::INFINITY));
     }
 }
