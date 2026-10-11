@@ -10,6 +10,9 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
+  # Pinned toolchain for Clippy, Fmt and Doc, so a new Rust release cannot
+  # turn CI red without a code change. Bump it deliberately (see README).
+  RUST_LINT_TOOLCHAIN: "1.99"
 
 jobs:
   test:
@@ -32,7 +35,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: ${{ env.RUST_LINT_TOOLCHAIN }}
           components: clippy
       - run: cargo clippy --all-targets -- -D warnings
+
+  fmt:
+    name: Fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_LINT_TOOLCHAIN }}
+          components: rustfmt
+      - run: cargo fmt --check
+
+  doc:
+    name: Doc
+    runs-on: ubuntu-latest
+    env:
+      RUSTDOCFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_LINT_TOOLCHAIN }}
+      - run: cargo doc --no-deps

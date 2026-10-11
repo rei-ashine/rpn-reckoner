@@ -1,5 +1,4 @@
-use std::io::{ self, Write };
-
+use std::io::{self, Write};
 
 fn main() -> Result<(), std::io::Error> {
     println!();
@@ -29,9 +28,13 @@ fn main() -> Result<(), std::io::Error> {
         let mut expression = String::new();
 
         let bytes_read = io::stdin().read_line(&mut expression)?;
-        if bytes_read == 0 { break; }
+        if bytes_read == 0 {
+            break;
+        }
 
-        if expression.trim() == "q" { break; }
+        if expression.trim() == "q" {
+            break;
+        }
 
         let solution = rpn_reckoner::eval(&expression);
 
@@ -43,7 +46,6 @@ fn main() -> Result<(), std::io::Error> {
     Ok(())
 }
 
-
 /// Formats a result, using exponent notation for magnitudes too large to show exactly
 fn format_number(value: f64) -> String {
     if value.is_finite() && value.abs() >= 1e16 {
@@ -52,7 +54,6 @@ fn format_number(value: f64) -> String {
         value.to_string()
     }
 }
-
 
 #[cfg(test)]
 mod tests {
