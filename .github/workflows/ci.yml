@@ -10,9 +10,11 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  # Pinned toolchain for Clippy, Fmt and Doc, so a new Rust release cannot
-  # turn CI red without a code change. Bump it deliberately (see README).
-  RUST_LINT_TOOLCHAIN: "1.99"
+  # Pinned toolchain for the Lint job (rustfmt, Clippy, rustdoc), so new
+  # lints or formatting rules in a Rust release cannot turn it red without a
+  # code change. The Test job intentionally keeps running on stable to catch
+  # real breakage from new compilers. Bump this deliberately (see README).
+  RUST_LINT_TOOLCHAIN: "1.99.0"
 
 jobs:
   test:
@@ -24,42 +26,18 @@ jobs:
         # stable plus the MSRV declared in Cargo.toml (rust-version)
         toolchain: [stable, "1.85"]
     steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ matrix.toolchain }}
-      - run: cargo test
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - run: rustup toolchain install "${{ matrix.toolchain }}" --profile minimal
+      - run: cargo +"${{ matrix.toolchain }}" test
 
-  clippy:
-    name: Clippy
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_LINT_TOOLCHAIN }}
-          components: clippy
-      - run: cargo clippy --all-targets -- -D warnings
-
-  fmt:
-    name: Fmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_LINT_TOOLCHAIN }}
-          components: rustfmt
-      - run: cargo fmt --check
-
-  doc:
-    name: Doc
-    runs-on: ubuntu-latest
-    env:
-      RUSTDOCFLAGS: -D warnings
-    steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_LINT_TOOLCHAIN }}
-      - run: cargo doc --no-deps
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - run: rustup toolchain install "$RUST_LINT_TOOLCHAIN" --profile minimal -c clippy,rustfmt
+      - run: cargo +"$RUST_LINT_TOOLCHAIN" fmt --check
+      - run: cargo +"$RUST_LINT_TOOLCHAIN" clippy --all-targets -- -D warnings
+      - run: cargo +"$RUST_LINT_TOOLCHAIN" doc --no-deps --document-private-items
+        env:
+          RUSTDOCFLAGS: -D warnings

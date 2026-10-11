@@ -59,19 +59,33 @@ cargo run
 
 ## Development
 
-CI runs the following checks on every pull request.
-Clippy, rustfmt and rustdoc use a pinned Rust toolchain,
-set by `RUST_LINT_TOOLCHAIN` in `.github/workflows/ci.yml` (currently 1.99).
+CI runs the checks below on every pull request.
+The Test job runs on stable and on the MSRV (`rust-version` in `Cargo.toml`).
+The Lint job (rustfmt, Clippy, rustdoc) uses a pinned Rust toolchain,
+set only by `RUST_LINT_TOOLCHAIN` in `.github/workflows/ci.yml`.
+The commands read both versions from those files, so they always match CI.
 
 ```bash
+MSRV=$(sed -n 's/^rust-version = "\(.*\)"/\1/p' Cargo.toml)
+LINT=$(sed -n 's/.*RUST_LINT_TOOLCHAIN: "\(.*\)".*/\1/p' .github/workflows/ci.yml)
+rustup toolchain install "$MSRV" "$LINT" --profile minimal -c clippy,rustfmt
+
 cargo test
-cargo +1.99 clippy --all-targets -- -D warnings
-cargo +1.99 fmt --check
-RUSTDOCFLAGS="-D warnings" cargo +1.99 doc --no-deps
+cargo +"$MSRV" test
+cargo +"$LINT" fmt --check
+cargo +"$LINT" clippy --all-targets -- -D warnings
+RUSTDOCFLAGS="-D warnings" cargo +"$LINT" doc --no-deps --document-private-items
 ```
 
-To move to a newer toolchain, update `RUST_LINT_TOOLCHAIN`,
-run the commands above with the new version, and fix any new findings in the same pull request.
+To move to a newer lint toolchain, change `RUST_LINT_TOOLCHAIN`,
+run the commands above, and fix any new findings in the same pull request.
+
+The rustfmt commit is listed in `.git-blame-ignore-revs`.
+GitHub's blame view skips it automatically; to skip it in local `git blame` too, run:
+
+```bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
 
 ## Directory Structure
 
@@ -79,8 +93,10 @@ run the commands above with the new version, and fix any new findings in the sam
 .
 ├── .git-blame-ignore-revs
 ├── .github
+│   ├── dependabot.yml
 │   └── workflows
 │       └── ci.yml
+├── .gitignore
 ├── README.md
 ├── Cargo.toml
 ├── LICENSE
@@ -102,16 +118,16 @@ run the commands above with the new version, and fix any new findings in the sam
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  TOML                      1           17           16            0            1
 ─────────────────────────────────────────────────────────────────────────────────
- Markdown                  1          108            0           78           30
- |- BASH                   1           10           10            0            0
+ Markdown                  1          118            0           86           32
+ |- BASH                   1           16           15            0            1
  |- Rust                   1            8            8            0            0
- (Total)                              126           18           78           30
+ (Total)                              142           23           86           33
 ─────────────────────────────────────────────────────────────────────────────────
  Rust                      4          249          208            8           33
  |- Markdown               3           41            0           37            4
  (Total)                              290          208           45           37
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Total                     6          433          242          123           68
+ Total                     6          449          247          131           71
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
