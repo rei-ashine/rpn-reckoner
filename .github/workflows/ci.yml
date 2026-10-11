@@ -26,7 +26,7 @@ jobs:
         # stable plus the MSRV declared in Cargo.toml (rust-version)
         toolchain: [stable, "1.85"]
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: rustup toolchain install "${{ matrix.toolchain }}" --profile minimal
       - run: cargo +"${{ matrix.toolchain }}" test
 
@@ -34,7 +34,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: rustup toolchain install "$RUST_LINT_TOOLCHAIN" --profile minimal -c clippy,rustfmt
       - run: cargo +"$RUST_LINT_TOOLCHAIN" fmt --check
       - run: cargo +"$RUST_LINT_TOOLCHAIN" clippy --all-targets -- -D warnings
