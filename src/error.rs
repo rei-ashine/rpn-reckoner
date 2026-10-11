@@ -22,6 +22,8 @@ pub enum Error {
         /// The operator token, e.g. `"/"`.
         operator: String,
     },
+    /// The operand of `!` was not a non-negative integer, e.g. `2.5` or `-1`.
+    InvalidFactorialOperand(f64),
     /// No value was left on the stack, e.g. for an empty expression.
     NoResult,
     /// More than one value was left on the stack.
@@ -38,6 +40,9 @@ impl fmt::Display for Error {
             Error::NonFiniteNumber(token) => write!(f, "Not a finite number: {token}"),
             Error::NonFiniteResult { operator } => {
                 write!(f, "Result of operator '{operator}' is not a finite number")
+            }
+            Error::InvalidFactorialOperand(value) => {
+                write!(f, "Factorial requires a non-negative integer, got {value}")
             }
             Error::NoResult => write!(f, "No result."),
             Error::TooManyValues => write!(f, "Too many values in the stack."),

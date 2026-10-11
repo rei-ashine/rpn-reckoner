@@ -86,6 +86,24 @@ fn test_non_finite() {
 }
 
 #[test]
+fn test_factorial_operand() {
+    for (expression, value) in [
+        ("2.5 !", 2.5),
+        ("0.4 !", 0.4),
+        ("0.5 !", 0.5),
+        ("-1 !", -1.0),
+    ] {
+        assert_eq!(
+            eval(expression),
+            Err(Error::InvalidFactorialOperand(value)),
+            "{expression}"
+        );
+    }
+    assert_eq!(eval("-0 !"), Ok(1.0));
+    assert_eq!(eval("1e3 1e3 / !"), Ok(1.0));
+}
+
+#[test]
 fn test_error_messages() {
     assert_eq!(
         not_enough_operands("+").to_string(),
@@ -102,6 +120,10 @@ fn test_error_messages() {
     assert_eq!(
         non_finite_result("/").to_string(),
         "Result of operator '/' is not a finite number"
+    );
+    assert_eq!(
+        Error::InvalidFactorialOperand(2.5).to_string(),
+        "Factorial requires a non-negative integer, got 2.5"
     );
     assert_eq!(Error::NoResult.to_string(), "No result.");
     assert_eq!(

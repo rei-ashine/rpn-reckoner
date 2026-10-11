@@ -30,7 +30,8 @@ pub use error::Error;
 ///
 /// Tokens are separated by white space. Each token is either a finite number
 /// (anything `str::parse::<f64>` accepts that is finite, e.g. `-3`, `2.5`, `1e3`)
-/// or one of the operators `+`, `-`, `*`, `/`, `%`, `^` (or `**`) and `!` (factorial).
+/// or one of the operators `+`, `-`, `*`, `/`, `%`, `^` (or `**`) and `!`
+/// (factorial, defined only for non-negative integers).
 /// Every intermediate result must be finite as well, so the returned value is always finite.
 ///
 /// # Errors
@@ -41,6 +42,7 @@ pub use error::Error;
 /// - a number is not finite (`inf`, `nan`, `1e400`, ...): [`Error::NonFiniteNumber`]
 /// - an operator produces a value that is not finite
 ///   (division by zero, NaN, overflow): [`Error::NonFiniteResult`]
+/// - the operand of `!` is not a non-negative integer: [`Error::InvalidFactorialOperand`]
 /// - no value is left on the stack: [`Error::NoResult`]
 /// - more than one value is left on the stack: [`Error::TooManyValues`]
 pub fn eval(expression: &str) -> Result<f64, Error> {
@@ -65,7 +67,10 @@ pub fn eval(expression: &str) -> Result<f64, Error> {
                     operator: token.to_string(),
                 });
             };
-            stack.push(finite(operation::factorial(value), token)?);
+            let Some(result) = operation::factorial(value) else {
+                return Err(Error::InvalidFactorialOperand(value));
+            };
+            stack.push(finite(result, token)?);
         } else {
             // Binary Operator
             let Some(operator) = operation::binary_operator(token) else {
