@@ -23,7 +23,6 @@
 
 mod operation;
 
-
 /// Evaluates an RPN expression and returns its value.
 ///
 /// Tokens are separated by white space. Each token is either a number
@@ -53,7 +52,9 @@ pub fn eval(expression: &str) -> Result<f64, String> {
         if token == "!" {
             // Unary Operator (Factorial)
             let Some(value) = stack.pop() else {
-                return Err(format!("[Error] Not enough operands for operator '{token}'"));
+                return Err(format!(
+                    "[Error] Not enough operands for operator '{token}'"
+                ));
             };
             stack.push(operation::factorial(value));
         } else {
@@ -62,7 +63,9 @@ pub fn eval(expression: &str) -> Result<f64, String> {
                 return Err(format!("[Error] Invalid operator: {token}"));
             };
             let (Some(right), Some(left)) = (stack.pop(), stack.pop()) else {
-                return Err(format!("[Error] Not enough operands for operator '{token}'"));
+                return Err(format!(
+                    "[Error] Not enough operands for operator '{token}'"
+                ));
             };
             stack.push(operator(left, right));
         }
@@ -75,7 +78,6 @@ pub fn eval(expression: &str) -> Result<f64, String> {
         _ => Err("[Error] Too many values in the stack.".to_string()),
     }
 }
-
 
 #[cfg(test)]
 mod test;

@@ -12,7 +12,6 @@ pub fn binary_operator(token: &str) -> Option<fn(f64, f64) -> f64> {
     Some(operator)
 }
 
-
 pub fn factorial(n: f64) -> f64 {
     if n < 0.0 || n.is_nan() {
         return f64::NAN;
@@ -23,11 +22,12 @@ pub fn factorial(n: f64) -> f64 {
 
     let n = n.round() as usize;
 
-    if n == 0 {return 1.0;}
+    if n == 0 {
+        return 1.0;
+    }
 
     (1..=n).fold(1.0, |acc, value| acc * value as f64)
 }
-
 
 #[cfg(test)]
 mod tests {
