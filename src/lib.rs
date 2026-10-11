@@ -20,6 +20,17 @@
 //! let solution = rpn_reckoner::eval("4 ! 2 +").unwrap();
 //! assert_eq!(solution, 26.0);
 //! ```
+//! # Errors
+//! ```
+//! use rpn_reckoner::Error;
+//!
+//! let error = rpn_reckoner::eval("1 0 /").unwrap_err();
+//! assert!(matches!(error, Error::NonFiniteResult { .. }));
+//! assert_eq!(
+//!     error.to_string(),
+//!     "Result of operator '/' is not a finite number"
+//! );
+//! ```
 
 mod error;
 mod operation;

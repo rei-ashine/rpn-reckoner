@@ -1,6 +1,6 @@
 # [RPN-Reckoner](https://crates.io/crates/rpn-reckoner/)
 
-DATE: Oct. 11th, 2026
+DATE: Oct. 12th, 2026
 
 This package provides a Rust library and  
 an executable for doing Reverse Polish Notation (: RPN) calculations.
@@ -8,9 +8,17 @@ an executable for doing Reverse Polish Notation (: RPN) calculations.
 ## Library
 
 This package's library allows for evaluating RPN expressions  
-by using the function `rpn_reckoner::eval(expression: &str) -> Result<f64, String>`.  
+by using the function `rpn_reckoner::eval(expression: &str) -> Result<f64, rpn_reckoner::Error>`.  
 This function takes an RPN expression as a string argument and returns a result,  
-either the evaluated value as a float or an error message as a string.
+either the evaluated value as a float or an `rpn_reckoner::Error`.
+
+- Operators: `+`, `-`, `*`, `/`, `%`, `^` (or `**`) and `!` (factorial).
+- Only finite numbers are accepted and produced:  
+  `inf` or `nan` as input, division by zero, and overflow are errors.
+- Factorial is defined only for non-negative integers (`2.5 !` is an error).
+
+Version 2.0.0 changed the error type and these rules.
+See [CHANGELOG.md](./CHANGELOG.md) for details and migration notes.
 
 ## Installation
 
@@ -35,6 +43,22 @@ fn main() {
 fn main() {
     let solution = rpn_reckoner::eval("6 4 ! +").unwrap();
     println!("{}", solution); // -> 30
+}
+```
+
+### Example3 (error handling)
+
+```rust
+use rpn_reckoner::Error;
+
+fn main() {
+    match rpn_reckoner::eval("1 0 /") {
+        Ok(solution) => println!("{}", solution),
+        Err(Error::NonFiniteResult { operator }) => {
+            println!("'{}' did not produce a finite number", operator); // -> '/' did not produce a finite number
+        }
+        Err(error) => println!("{}", error),
+    }
 }
 ```
 
@@ -98,12 +122,14 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 │       └── ci.yml
 ├── .gitignore
 ├── README.md
+├── CHANGELOG.md
 ├── Cargo.toml
 ├── LICENSE
 ├── PNG
 │   ├── RPN-Reckoner_20230208.png
 │   └── RPN-Reckoner_REPL.png
 └── src
+    ├── error.rs
     ├── lib.rs
     ├── main.rs
     ├── operation.rs
@@ -118,16 +144,16 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  TOML                      1           17           16            0            1
 ─────────────────────────────────────────────────────────────────────────────────
- Markdown                  1          118            0           86           32
+ Markdown                  2          212            0          156           56
  |- BASH                   1           16           15            0            1
- |- Rust                   1            8            8            0            0
- (Total)                              142           23           86           33
+ |- Rust                   1           19           18            0            1
+ (Total)                              247           33          156           58
 ─────────────────────────────────────────────────────────────────────────────────
- Rust                      4          249          208            8           33
- |- Markdown               3           41            0           37            4
- (Total)                              290          208           45           37
+ Rust                      5          378          322           12           44
+ |- Markdown               4           75            0           68            7
+ (Total)                              453          322           80           51
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Total                     6          449          247          131           71
+ Total                     8          717          371          236          110
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 

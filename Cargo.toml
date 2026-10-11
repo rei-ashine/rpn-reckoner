@@ -6,10 +6,10 @@ rust-version = "1.85"
 authors = ["rei-ashine"]
 description = "A Reverse Polish Notation library"
 license = "MIT"
-include = ["src/", "README.md", "LICENSE"]
+include = ["src/", "README.md", "LICENSE", "CHANGELOG.md"]
 repository = "https://github.com/rei-ashine/rpn-reckoner"
 keywords = ["rpn", "reverse-polish", "postfix", "calculator", "repl"]
-categories = ["command-line-utilities"]
+categories = ["command-line-utilities", "mathematics"]
 
 [[bin]]
 name = "rpn-reckoner"
