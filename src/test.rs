@@ -1,4 +1,4 @@
-use crate::eval;
+use crate::{Error, eval};
 
 #[test]
 fn test_binary_operators() {
@@ -19,7 +19,6 @@ fn test_factorial_operator() {
     assert_eq!(eval("6 4 ! +"), Ok(30.0));
 
     assert_eq!(eval("0 !"), Ok(1.0));
-    assert_eq!(eval("inf !"), Ok(f64::INFINITY));
 }
 
 #[test]
@@ -44,31 +43,103 @@ fn test_white_space() {
 
 #[test]
 fn test_errors() {
+    assert_eq!(eval("a + 2"), Err(Error::InvalidToken("a".to_string())));
+    assert_eq!(eval(""), Err(Error::NoResult));
+    assert_eq!(eval("1 2 3"), Err(Error::TooManyValues));
+
+    assert_eq!(eval("+"), Err(not_enough_operands("+")));
+    assert_eq!(eval("1 +"), Err(not_enough_operands("+")));
+    assert_eq!(eval("!"), Err(not_enough_operands("!")));
+
+    assert_eq!(eval("0 4 !"), Err(Error::TooManyValues));
+}
+
+#[test]
+fn test_non_finite() {
+    // Non-finite numbers are rejected as input
+    for token in ["inf", "-inf", "+inf", "infinity", "nan", "NaN", "1e400"] {
+        assert_eq!(
+            eval(token),
+            Err(Error::NonFiniteNumber(token.to_string())),
+            "{token}"
+        );
+    }
     assert_eq!(
-        eval("a + 2"),
-        Err("[Error] Invalid operator: a".to_string())
-    );
-    assert_eq!(eval(""), Err("[Error] No result.".to_string()));
-    assert_eq!(
-        eval("1 2 3"),
-        Err("[Error] Too many values in the stack.".to_string())
+        eval("inf !"),
+        Err(Error::NonFiniteNumber("inf".to_string()))
     );
 
-    assert_eq!(
-        eval("+"),
-        Err("[Error] Not enough operands for operator '+'".to_string())
-    );
-    assert_eq!(
-        eval("1 +"),
-        Err("[Error] Not enough operands for operator '+'".to_string())
-    );
-    assert_eq!(
-        eval("!"),
-        Err("[Error] Not enough operands for operator '!'".to_string())
-    );
+    // Non-finite results are errors, wherever they occur
+    assert_eq!(eval("1 0 /"), Err(non_finite_result("/")));
+    assert_eq!(eval("-1 0 /"), Err(non_finite_result("/")));
+    assert_eq!(eval("0 0 /"), Err(non_finite_result("/")));
+    assert_eq!(eval("5 0 %"), Err(non_finite_result("%")));
+    assert_eq!(eval("-8 0.333 ^"), Err(non_finite_result("^")));
+    assert_eq!(eval("1e308 10 *"), Err(non_finite_result("*")));
+    assert_eq!(eval("1 0 / -1 ^"), Err(non_finite_result("/")));
+    assert_eq!(eval("1 0 / x"), Err(non_finite_result("/")));
+    assert_eq!(eval("171 !"), Err(non_finite_result("!")));
 
+    // Large but finite values are still fine
+    assert_eq!(eval("1e308"), Ok(1e308));
+    assert!(eval("170 !").is_ok_and(f64::is_finite));
+}
+
+#[test]
+fn test_factorial_operand() {
+    for (expression, value) in [
+        ("2.5 !", 2.5),
+        ("0.4 !", 0.4),
+        ("0.5 !", 0.5),
+        ("-1 !", -1.0),
+    ] {
+        assert_eq!(
+            eval(expression),
+            Err(Error::InvalidFactorialOperand(value)),
+            "{expression}"
+        );
+    }
+    assert_eq!(eval("-0 !"), Ok(1.0));
+    assert_eq!(eval("1e3 1e3 / !"), Ok(1.0));
+}
+
+#[test]
+fn test_error_messages() {
     assert_eq!(
-        eval("0 4 !"),
-        Err("[Error] Too many values in the stack.".to_string())
+        not_enough_operands("+").to_string(),
+        "Not enough operands for operator '+'"
     );
+    assert_eq!(
+        Error::InvalidToken("a".to_string()).to_string(),
+        "Invalid operator: a"
+    );
+    assert_eq!(
+        Error::NonFiniteNumber("inf".to_string()).to_string(),
+        "Not a finite number: inf"
+    );
+    assert_eq!(
+        non_finite_result("/").to_string(),
+        "Result of operator '/' is not a finite number"
+    );
+    assert_eq!(
+        Error::InvalidFactorialOperand(2.5).to_string(),
+        "Factorial requires a non-negative integer, got 2.5"
+    );
+    assert_eq!(Error::NoResult.to_string(), "No result.");
+    assert_eq!(
+        Error::TooManyValues.to_string(),
+        "Too many values in the stack."
+    );
+}
+
+fn not_enough_operands(operator: &str) -> Error {
+    Error::NotEnoughOperands {
+        operator: operator.to_string(),
+    }
+}
+
+fn non_finite_result(operator: &str) -> Error {
+    Error::NonFiniteResult {
+        operator: operator.to_string(),
+    }
 }

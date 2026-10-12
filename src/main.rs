@@ -39,7 +39,7 @@ fn main() -> Result<(), std::io::Error> {
         let solution = rpn_reckoner::eval(&expression);
 
         match solution {
-            Err(e) => println!("\n👻 {e}"),
+            Err(e) => println!("\n👻 [Error] {e}"),
             Ok(r) => println!("\n✅ {}", format_number(r)),
         }
     }
