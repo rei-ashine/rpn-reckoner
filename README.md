@@ -79,7 +79,27 @@ cd rpn-reckoner
 cargo run
 ```
 
-![REPL](./PNG/RPN-Reckoner_REPL.png)
+An example session (the start-up banner is omitted):
+
+```text
+🚀 RPN > 3 2 +
+
+✅ 5
+
+🚀 RPN > 6 4 ! +
+
+✅ 30
+
+🚀 RPN > 1 0 /
+
+👻 [Error] Result of operator '/' is not a finite number
+
+🚀 RPN > 2.5 !
+
+👻 [Error] Factorial requires a non-negative integer, got 2.5
+
+🚀 RPN > q
+```
 
 ## Development
 
