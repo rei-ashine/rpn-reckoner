@@ -13,6 +13,23 @@ fn test_binary_operators() {
 }
 
 #[test]
+fn test_operator_semantics() {
+    // `%` is the remainder of truncated division: the sign follows the dividend
+    assert_eq!(eval("-7 3 %"), Ok(-1.0));
+    assert_eq!(eval("7 -3 %"), Ok(1.0));
+    assert_eq!(eval("7.5 2 %"), Ok(1.5));
+
+    // `^` and `**` are real-number powers
+    assert_eq!(eval("2 -2 ^"), Ok(0.25));
+    assert_eq!(eval("4 0.5 **"), Ok(2.0));
+
+    // Any finite number syntax accepted by `str::parse::<f64>`
+    assert_eq!(eval(".5 .5 +"), Ok(1.0));
+    assert_eq!(eval("5. 1 +"), Ok(6.0));
+    assert_eq!(eval("1E3"), Ok(1000.0));
+}
+
+#[test]
 fn test_factorial_operator() {
     assert_eq!(eval("4 !"), Ok(24.0));
     assert_eq!(eval("4 ! 2 +"), Ok(26.0));

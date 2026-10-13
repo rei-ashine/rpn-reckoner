@@ -40,9 +40,16 @@ pub use error::Error;
 /// Evaluates an RPN expression and returns its value.
 ///
 /// Tokens are separated by white space. Each token is either a finite number
-/// (anything `str::parse::<f64>` accepts that is finite, e.g. `-3`, `2.5`, `1e3`)
-/// or one of the operators `+`, `-`, `*`, `/`, `%`, `^` (or `**`) and `!`
-/// (factorial, defined only for non-negative integers).
+/// (anything `str::parse::<f64>` accepts that is finite, e.g. `-3`, `2.5`, `.5`, `1e3`)
+/// or one of these operators:
+///
+/// | Operator | Meaning |
+/// |---|---|
+/// | `+`, `-`, `*`, `/` | Arithmetic on `f64` |
+/// | `%` | Remainder of truncated division; the sign follows the dividend (`-7 3 %` is `-1`) |
+/// | `^`, `**` | Real-number power, as [`f64::powf`] (`2 -2 ^` is `0.25`) |
+/// | `!` | Factorial, defined only for non-negative integers |
+///
 /// Every intermediate result must be finite as well, so the returned value is always finite.
 ///
 /// # Errors

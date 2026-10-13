@@ -11,6 +11,9 @@ This function takes an RPN expression as a string argument and returns a result,
 either the evaluated value as a float or an `rpn_reckoner::Error`.
 
 - Operators: `+`, `-`, `*`, `/`, `%`, `^` (or `**`) and `!` (factorial).
+  - `%` is the remainder of truncated division, so its sign follows the dividend (`-7 3 %` is `-1`).
+  - `^` and `**` are real-number powers (`2 -2 ^` is `0.25`).
+- Numbers are anything Rust's `f64` parser accepts, such as `-3`, `2.5`, `.5` and `1e3`.
 - Only finite numbers are accepted and produced:  
   `inf` or `nan` as input, division by zero, and overflow are errors.
 - Factorial is defined only for non-negative integers (`2.5 !` is an error).
@@ -151,7 +154,6 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
     ├── operation.rs
     └── test.rs
 ```
-
 
 ## Reference
 
