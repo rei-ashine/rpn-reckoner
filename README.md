@@ -1,7 +1,5 @@
 # [RPN-Reckoner](https://crates.io/crates/rpn-reckoner/)
 
-DATE: Oct. 12th, 2026
-
 This package provides a Rust library and  
 an executable for doing Reverse Polish Notation (: RPN) calculations.
 
@@ -13,6 +11,9 @@ This function takes an RPN expression as a string argument and returns a result,
 either the evaluated value as a float or an `rpn_reckoner::Error`.
 
 - Operators: `+`, `-`, `*`, `/`, `%`, `^` (or `**`) and `!` (factorial).
+  - `%` is the remainder of truncated division, so its sign follows the dividend (`-7 3 %` is `-1`).
+  - `^` and `**` are real-number powers (`2 -2 ^` is `0.25`).
+- Numbers are anything Rust's `f64` parser accepts, such as `-3`, `2.5`, `.5` and `1e3`.
 - Only finite numbers are accepted and produced:  
   `inf` or `nan` as input, division by zero, and overflow are errors.
 - Factorial is defined only for non-negative integers (`2.5 !` is an error).
@@ -132,6 +133,33 @@ GitHub's blame view skips it automatically; to skip it in local `git blame` too,
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
+## Releasing
+
+Releases are published to crates.io by `.github/workflows/release.yml`
+when a version tag is pushed. It uses crates.io trusted publishing,
+so no API token is stored in GitHub or on a local machine.
+
+One-time setup on crates.io (crate settings → Trusted Publishing):
+add a GitHub publisher with owner `rei-ashine`, repository `rpn-reckoner`,
+workflow `release.yml` and environment `release`.
+
+For each release:
+
+1. Open a pull request that updates `version` in `Cargo.toml`
+   and adds a `## <version> (<date>)` entry to `CHANGELOG.md`, and merge it.
+2. Tag the merge commit on `main` and push the tag:
+
+   ```bash
+   git checkout main && git pull
+   git tag v<version>
+   git push origin v<version>
+   ```
+
+Before publishing, the workflow checks that the tag matches the version in `Cargo.toml`,
+that `CHANGELOG.md` has an entry for it, and that the tagged commit is on `main`.
+It then runs the tests and `cargo publish --dry-run`,
+and only then requests a short-lived token and publishes.
+
 ## Directory Structure
 
 ```text
@@ -139,43 +167,22 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 ├── .git-blame-ignore-revs
 ├── .github
 │   ├── dependabot.yml
+│   ├── scripts
+│   │   └── check-release.sh
 │   └── workflows
-│       └── ci.yml
+│       ├── ci.yml
+│       └── release.yml
 ├── .gitignore
 ├── README.md
 ├── CHANGELOG.md
 ├── Cargo.toml
 ├── LICENSE
-├── PNG
-│   ├── RPN-Reckoner_20230208.png
-│   └── RPN-Reckoner_REPL.png
 └── src
     ├── error.rs
     ├── lib.rs
     ├── main.rs
     ├── operation.rs
     └── test.rs
-```
-
----
-
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Language              Files        Lines         Code     Comments       Blanks
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- TOML                      1           17           16            0            1
-─────────────────────────────────────────────────────────────────────────────────
- Markdown                  2          232            0          167           65
- |- BASH                   1           17           16            0            1
- |- Rust                   1           19           18            0            1
- (Total)                              268           34          167           67
-─────────────────────────────────────────────────────────────────────────────────
- Rust                      5          409          348           13           48
- |- Markdown               5           77            0           70            7
- (Total)                              486          348           83           55
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Total                     8          771          398          250          123
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ## Reference
