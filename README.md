@@ -144,9 +144,6 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 ├── CHANGELOG.md
 ├── Cargo.toml
 ├── LICENSE
-├── PNG
-│   ├── RPN-Reckoner_20230208.png
-│   └── RPN-Reckoner_REPL.png
 └── src
     ├── error.rs
     ├── lib.rs
