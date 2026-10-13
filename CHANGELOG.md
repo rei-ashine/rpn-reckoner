@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Documentation: describe the operator rules (`%` keeps the sign of the dividend,
+  `^`/`**` are real-number powers) and the accepted number syntax.
+- README: show a text transcript of the REPL instead of an outdated screenshot.
+- Releases are now published from GitHub Actions using crates.io trusted publishing.
+
 ## 2.0.0 (2026-10-12)
 
 ### Breaking changes

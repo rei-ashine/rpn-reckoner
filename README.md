@@ -133,6 +133,33 @@ GitHub's blame view skips it automatically; to skip it in local `git blame` too,
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
+## Releasing
+
+Releases are published to crates.io by `.github/workflows/release.yml`
+when a version tag is pushed. It uses crates.io trusted publishing,
+so no API token is stored in GitHub or on a local machine.
+
+One-time setup on crates.io (crate settings → Trusted Publishing):
+add a GitHub publisher with owner `rei-ashine`, repository `rpn-reckoner`,
+workflow `release.yml` and environment `release`.
+
+For each release:
+
+1. Open a pull request that updates `version` in `Cargo.toml`
+   and adds a `## <version> (<date>)` entry to `CHANGELOG.md`, and merge it.
+2. Tag the merge commit on `main` and push the tag:
+
+   ```bash
+   git checkout main && git pull
+   git tag v<version>
+   git push origin v<version>
+   ```
+
+Before publishing, the workflow checks that the tag matches the version in `Cargo.toml`,
+that `CHANGELOG.md` has an entry for it, and that the tagged commit is on `main`.
+It then runs the tests and `cargo publish --dry-run`,
+and only then requests a short-lived token and publishes.
+
 ## Directory Structure
 
 ```text
@@ -140,8 +167,11 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 ├── .git-blame-ignore-revs
 ├── .github
 │   ├── dependabot.yml
+│   ├── scripts
+│   │   └── check-release.sh
 │   └── workflows
-│       └── ci.yml
+│       ├── ci.yml
+│       └── release.yml
 ├── .gitignore
 ├── README.md
 ├── CHANGELOG.md
