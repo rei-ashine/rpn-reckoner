@@ -23,12 +23,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # stable plus the MSRV declared in Cargo.toml (rust-version)
-        toolchain: [stable, "1.85"]
+        # stable, and the MSRV read from `rust-version` in Cargo.toml
+        toolchain: [stable, msrv]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - run: rustup toolchain install "${{ matrix.toolchain }}" --profile minimal
-      - run: cargo +"${{ matrix.toolchain }}" test
+      - name: Resolve toolchain
+        id: toolchain
+        run: |
+          if [ "${{ matrix.toolchain }}" = msrv ]; then
+            version=$(sed -n 's/^rust-version = "\(.*\)"/\1/p' Cargo.toml)
+          else
+            version="${{ matrix.toolchain }}"
+          fi
+          if [ -z "$version" ]; then
+            echo "::error::could not determine the toolchain for ${{ matrix.toolchain }}"
+            exit 1
+          fi
+          echo "Using Rust $version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - run: rustup toolchain install "${{ steps.toolchain.outputs.version }}" --profile minimal
+      - run: cargo +"${{ steps.toolchain.outputs.version }}" test
 
   lint:
     name: Lint
@@ -41,3 +55,13 @@ jobs:
       - run: cargo +"$RUST_LINT_TOOLCHAIN" doc --no-deps --document-private-items
         env:
           RUSTDOCFLAGS: -D warnings
+      - name: Check package contents
+        run: |
+          cargo +"$RUST_LINT_TOOLCHAIN" package --list > "$RUNNER_TEMP/package-files.txt"
+          cat "$RUNNER_TEMP/package-files.txt"
+          for file in Cargo.toml README.md LICENSE CHANGELOG.md src/lib.rs src/main.rs; do
+            if ! grep -qx "$file" "$RUNNER_TEMP/package-files.txt"; then
+              echo "::error::$file is missing from the published package"
+              exit 1
+            fi
+          done

@@ -143,3 +143,36 @@ fn non_finite_result(operator: &str) -> Error {
         operator: operator.to_string(),
     }
 }
+
+/// Evaluates many pseudo-random expressions and checks invariants that must hold
+/// for every input: `eval` never panics, and every successful result is finite.
+#[test]
+fn test_random_expressions() {
+    const TOKENS: [&str; 24] = [
+        "0", "1", "2", "-3", "2.5", "-0", "0.5", "1e3", "1e308", "170", "171", "inf", "nan",
+        "1e400", "+", "-", "*", "/", "%", "^", "**", "!", "x", "++",
+    ];
+    const SEPARATORS: [&str; 4] = [" ", "  ", "\t", "\n"];
+
+    // A fixed-seed linear congruential generator keeps the test deterministic
+    let mut state: u64 = 0x2545_F491_4F6C_DD1D;
+    let mut next = |bound: usize| {
+        state = state
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1_442_695_040_888_963_407);
+        (state >> 33) as usize % bound
+    };
+
+    for _ in 0..20_000 {
+        let length = next(10);
+        let expression = (0..length)
+            .map(|_| TOKENS[next(TOKENS.len())])
+            .collect::<Vec<_>>()
+            .join(SEPARATORS[next(SEPARATORS.len())]);
+
+        match eval(&expression) {
+            Ok(value) => assert!(value.is_finite(), "{expression:?} => {value}"),
+            Err(error) => assert!(!error.to_string().is_empty(), "{expression:?}"),
+        }
+    }
+}

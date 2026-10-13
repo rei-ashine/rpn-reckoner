@@ -79,7 +79,27 @@ cd rpn-reckoner
 cargo run
 ```
 
-![REPL](./PNG/RPN-Reckoner_REPL.png)
+An example session (the start-up banner is omitted):
+
+```text
+🚀 RPN > 3 2 +
+
+✅ 5
+
+🚀 RPN > 6 4 ! +
+
+✅ 30
+
+🚀 RPN > 1 0 /
+
+👻 [Error] Result of operator '/' is not a finite number
+
+🚀 RPN > 2.5 !
+
+👻 [Error] Factorial requires a non-negative integer, got 2.5
+
+🚀 RPN > q
+```
 
 ## Development
 
@@ -99,6 +119,7 @@ cargo +"$MSRV" test
 cargo +"$LINT" fmt --check
 cargo +"$LINT" clippy --all-targets -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo +"$LINT" doc --no-deps --document-private-items
+cargo +"$LINT" package --list   # must include LICENSE and CHANGELOG.md
 ```
 
 To move to a newer lint toolchain, change `RUST_LINT_TOOLCHAIN`,
@@ -144,16 +165,16 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  TOML                      1           17           16            0            1
 ─────────────────────────────────────────────────────────────────────────────────
- Markdown                  2          212            0          156           56
- |- BASH                   1           16           15            0            1
+ Markdown                  2          232            0          167           65
+ |- BASH                   1           17           16            0            1
  |- Rust                   1           19           18            0            1
- (Total)                              247           33          156           58
+ (Total)                              268           34          167           67
 ─────────────────────────────────────────────────────────────────────────────────
- Rust                      5          378          322           12           44
- |- Markdown               4           75            0           68            7
- (Total)                              453          322           80           51
+ Rust                      5          409          348           13           48
+ |- Markdown               5           77            0           70            7
+ (Total)                              486          348           83           55
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Total                     8          717          371          236          110
+ Total                     8          771          398          250          123
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
