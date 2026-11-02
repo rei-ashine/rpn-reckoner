@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.0.1 (2026-11-02)
 
 - Documentation: describe the operator rules (`%` keeps the sign of the dividend,
   `^`/`**` are real-number powers) and the accepted number syntax.
