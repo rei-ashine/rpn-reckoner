@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- REPL: `quit` and `exit` also leave the REPL, in addition to `q` and Ctrl-D.
+- REPL: fix two characters in the start-up banner so the `R` and `P` match the colossal font.
+
 ## 2.0.1 (2026-11-02)
 
 - Documentation: describe the operator rules (`%` keeps the sign of the dividend,
