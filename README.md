@@ -80,6 +80,8 @@ cd rpn-reckoner
 cargo run
 ```
 
+Type `q`, `quit` or `exit` (or press Ctrl-D) to leave.
+
 An example session (the start-up banner is omitted):
 
 ```text
