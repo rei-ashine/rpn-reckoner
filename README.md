@@ -81,6 +81,7 @@ cargo run
 ```
 
 Type `q`, `quit` or `exit` (or press Ctrl-D) to leave.
+Run `rpn-reckoner --help` for the options, or `rpn-reckoner --version` for the version.
 
 An example session (the start-up banner is omitted):
 
