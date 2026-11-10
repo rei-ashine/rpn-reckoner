@@ -162,6 +162,8 @@ Before publishing, the workflow checks that the tag matches the version in `Carg
 that `CHANGELOG.md` has an entry for it, and that the tagged commit is on `main`.
 It then runs the tests and `cargo publish --dry-run`,
 and only then requests a short-lived token and publishes.
+After the crate is published, a second job creates a GitHub release for the tag,
+using the version's `CHANGELOG.md` entry as the release notes.
 
 ## Directory Structure
 
@@ -171,7 +173,8 @@ and only then requests a short-lived token and publishes.
 ├── .github
 │   ├── dependabot.yml
 │   ├── scripts
-│   │   └── check-release.sh
+│   │   ├── check-release.sh
+│   │   └── release-notes.sh
 │   └── workflows
 │       ├── ci.yml
 │       └── release.yml
