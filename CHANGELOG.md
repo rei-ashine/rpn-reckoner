@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- REPL: added the `-h`/`--help` and `-V`/`--version` options.
+  Any other argument is now reported as an error (exit code 2) instead of being ignored.
+- REPL: a line that is not valid UTF-8 is reported as an error instead of stopping the REPL.
+- REPL: blank lines are ignored instead of reporting `No result.`
+- REPL: the prompt line is ended when the input ends (Ctrl-D), so the shell prompt starts on a new line.
+
 ## 2.0.2 (2026-11-02)
 
 - REPL: `quit` and `exit` also leave the REPL, in addition to `q` and Ctrl-D.
