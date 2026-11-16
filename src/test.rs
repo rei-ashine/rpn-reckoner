@@ -30,6 +30,31 @@ fn test_operator_semantics() {
 }
 
 #[test]
+fn test_unary_operators() {
+    assert_eq!(eval("9 sqrt"), Ok(3.0));
+    assert_eq!(eval("2 sqrt"), Ok(2_f64.sqrt()));
+    assert_eq!(eval("0 sqrt"), Ok(0.0));
+    assert_eq!(eval("-3 abs"), Ok(3.0));
+    assert_eq!(eval("3 abs"), Ok(3.0));
+    assert_eq!(eval("3 neg"), Ok(-3.0));
+    assert_eq!(eval("-3 neg"), Ok(3.0));
+
+    // Unary operators act on the top of the stack only
+    assert_eq!(eval("1 9 sqrt +"), Ok(4.0));
+    assert_eq!(eval("5 2 neg -"), Ok(7.0));
+    assert_eq!(eval("16 sqrt sqrt"), Ok(2.0));
+
+    // The square root of a negative number is not finite
+    assert_eq!(eval("-1 sqrt"), Err(non_finite_result("sqrt")));
+    assert_eq!(eval("sqrt"), Err(not_enough_operands("sqrt")));
+    assert_eq!(eval("abs"), Err(not_enough_operands("abs")));
+    assert_eq!(eval("neg"), Err(not_enough_operands("neg")));
+
+    // Names are case-sensitive
+    assert_eq!(eval("9 SQRT"), Err(Error::InvalidToken("SQRT".to_string())));
+}
+
+#[test]
 fn test_factorial_operator() {
     assert_eq!(eval("4 !"), Ok(24.0));
     assert_eq!(eval("4 ! 2 +"), Ok(26.0));
@@ -165,9 +190,9 @@ fn non_finite_result(operator: &str) -> Error {
 /// for every input: `eval` never panics, and every successful result is finite.
 #[test]
 fn test_random_expressions() {
-    const TOKENS: [&str; 24] = [
+    const TOKENS: [&str; 27] = [
         "0", "1", "2", "-3", "2.5", "-0", "0.5", "1e3", "1e308", "170", "171", "inf", "nan",
-        "1e400", "+", "-", "*", "/", "%", "^", "**", "!", "x", "++",
+        "1e400", "+", "-", "*", "/", "%", "^", "**", "!", "sqrt", "abs", "neg", "x", "++",
     ];
     const SEPARATORS: [&str; 4] = [" ", "  ", "\t", "\n"];
 

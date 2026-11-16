@@ -10,7 +10,9 @@ by using the function `rpn_reckoner::eval(expression: &str) -> Result<f64, rpn_r
 This function takes an RPN expression as a string argument and returns a result,  
 either the evaluated value as a float or an `rpn_reckoner::Error`.
 
-- Operators: `+`, `-`, `*`, `/`, `%`, `^` (or `**`) and `!` (factorial).
+- Binary operators: `+`, `-`, `*`, `/`, `%` and `^` (or `**`).
+- Unary operators: `!` (factorial), `sqrt` (square root), `abs` (absolute value) and `neg` (negation).
+  They apply to the value on top of the stack, so `9 sqrt 1 +` is `4`.
   - `%` is the remainder of truncated division, so its sign follows the dividend (`-7 3 %` is `-1`).
   - `^` and `**` are real-number powers (`2 -2 ^` is `0.25`).
 - Numbers are anything Rust's `f64` parser accepts, such as `-3`, `2.5`, `.5` and `1e3`.

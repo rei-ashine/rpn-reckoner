@@ -20,6 +20,11 @@
 //! let solution = rpn_reckoner::eval("4 ! 2 +").unwrap();
 //! assert_eq!(solution, 26.0);
 //! ```
+//! # Example5
+//! ```
+//! let solution = rpn_reckoner::eval("9 sqrt 2 neg abs +").unwrap();
+//! assert_eq!(solution, 5.0);
+//! ```
 //! # Errors
 //! ```
 //! use rpn_reckoner::Error;
@@ -49,6 +54,9 @@ pub use error::Error;
 /// | `%` | Remainder of truncated division; the sign follows the dividend (`-7 3 %` is `-1`) |
 /// | `^`, `**` | Real-number power, as [`f64::powf`] (`2 -2 ^` is `0.25`) |
 /// | `!` | Factorial, defined only for non-negative integers |
+/// | `sqrt` | Square root; a negative operand is an error |
+/// | `abs` | Absolute value |
+/// | `neg` | Negation (`3 neg` is `-3`) |
 ///
 /// Every intermediate result must be finite as well, so the returned value is always finite.
 ///
@@ -59,7 +67,7 @@ pub use error::Error;
 /// - a token is neither a number nor an operator: [`Error::InvalidToken`]
 /// - a number is not finite (`inf`, `nan`, `1e400`, ...): [`Error::NonFiniteNumber`]
 /// - an operator produces a value that is not finite
-///   (division by zero, NaN, overflow): [`Error::NonFiniteResult`]
+///   (division by zero, the square root of a negative number, overflow): [`Error::NonFiniteResult`]
 /// - the operand of `!` is not a non-negative integer: [`Error::InvalidFactorialOperand`]
 /// - no value is left on the stack: [`Error::NoResult`]
 /// - more than one value is left on the stack: [`Error::TooManyValues`]
@@ -78,7 +86,15 @@ pub fn eval(expression: &str) -> Result<f64, Error> {
         }
 
         // Push calculation results onto the stack
-        if token == "!" {
+        if let Some(operator) = operation::unary_operator(token) {
+            // Unary Operator (sqrt, abs, neg)
+            let Some(value) = stack.pop() else {
+                return Err(Error::NotEnoughOperands {
+                    operator: token.to_string(),
+                });
+            };
+            stack.push(finite(operator(value), token)?);
+        } else if token == "!" {
             // Unary Operator (Factorial)
             let Some(value) = stack.pop() else {
                 return Err(Error::NotEnoughOperands {

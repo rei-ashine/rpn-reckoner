@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added the unary operators `sqrt` (square root), `abs` (absolute value) and `neg` (negation).
+  `-1 sqrt` is an error, like every other result that is not finite.
+  These names were invalid tokens before, so no expression that evaluated in 2.1.0 changes its result.
+
 ## 2.1.0 (2026-11-16)
 
 - REPL: added the `-h`/`--help` and `-V`/`--version` options.
