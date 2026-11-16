@@ -15,6 +15,8 @@
 - Command line: arguments that start with `--`, other than `--help` and `--version`, are still
   reported as unknown options (exit status 2). Other arguments are no longer rejected:
   they are evaluated as an expression.
+- Documentation: the crate page now starts with a short summary, the package description
+  mentions the command-line tool, and the README no longer embeds an image from an external site.
 
 ## 2.1.0 (2026-11-16)
 

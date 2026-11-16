@@ -36,8 +36,14 @@ pub fn factorial(n: f64) -> Option<f64> {
         return Some(f64::INFINITY);
     }
 
-    let n = n as u64;
-    Some((1..=n).fold(1.0, |acc, value| acc * value as f64))
+    // Multiply in f64 directly: every factor up to 170 is exact, and no casts are needed
+    let mut result = 1.0;
+    let mut factor = 2.0;
+    while factor <= n {
+        result *= factor;
+        factor += 1.0;
+    }
+    Some(result)
 }
 
 #[cfg(test)]

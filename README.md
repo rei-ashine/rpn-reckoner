@@ -77,7 +77,7 @@ rpn-reckoner
 Alternatively, clone this repository and run the command `cargo run` in the terminal.
 
 ```bash
-git clone https://github.com/Rei-Ashine/rpn-reckoner.git
+git clone https://github.com/rei-ashine/rpn-reckoner.git
 cd rpn-reckoner
 cargo run
 ```
@@ -219,8 +219,6 @@ using the version's `CHANGELOG.md` entry as the release notes.
 
 - [『高効率言語 Rust 書きかた・作りかた』](https://www.socym.co.jp/book/1351)
 
-![ref1](https://www.socym.co.jp/wp-content/uploads/2022/120Px_syoei-1.jpg)
-
 ## License
 
-- [MIT](https://github.com/Rei-Ashine/rpn-reckoner/blob/main/LICENSE)
+- [MIT](https://github.com/rei-ashine/rpn-reckoner/blob/main/LICENSE)

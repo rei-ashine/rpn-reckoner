@@ -1,5 +1,10 @@
 //! # RPN-Reckoner
-//! Reverse Polish Notation (: RPN) - Reckoner
+//!
+//! Evaluates Reverse Polish Notation (RPN) expressions such as `"3 4 + 2 *"`.
+//! The whole library is one function, [`eval`], which returns the value as an `f64`
+//! or an [`Error`]. See [`eval`] for the operators and number syntax.
+//!
+//! The package also installs the `rpn-reckoner` command, an interactive calculator.
 //! # Example1
 //! ```
 //! let solution = rpn_reckoner::eval("1 2 +").unwrap();
