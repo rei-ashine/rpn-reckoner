@@ -5,6 +5,16 @@
 - Added the unary operators `sqrt` (square root), `abs` (absolute value) and `neg` (negation).
   `-1 sqrt` is an error, like every other result that is not finite.
   These names were invalid tokens before, so no expression that evaluated in 2.1.0 changes its result.
+- Command line: `rpn-reckoner <expression>` evaluates the expression, prints the result and exits.
+  The arguments are joined with spaces, so `rpn-reckoner 3 4 +` works too.
+  A failing expression prints the error to standard error and exits with status 1.
+- Command line: when the input is not a terminal (for example a pipe), each line is evaluated
+  and printed as one result per line, without the banner and prompt.
+  Errors go to standard error with their line number, and the exit status is 1 if any line failed.
+  Previously, piped input was shown with the banner and prompts.
+- Command line: arguments that start with `--`, other than `--help` and `--version`, are still
+  reported as unknown options (exit status 2). Other arguments are no longer rejected:
+  they are evaluated as an expression.
 
 ## 2.1.0 (2026-11-16)
 

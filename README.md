@@ -107,6 +107,28 @@ An example session (the start-up banner is omitted):
 🚀 RPN > q
 ```
 
+### Command line and pipes
+
+Give an expression as arguments to evaluate it once.
+Quote it so that the shell does not expand `*`:
+
+```bash
+rpn-reckoner '3 4 *'        # -> 12
+rpn-reckoner 9 sqrt 1 +     # -> 4
+```
+
+When the input is not a terminal, each line is evaluated
+and printed as one result per line, without the banner and prompt:
+
+```bash
+printf '1 2 +\n2 sqrt\n' | rpn-reckoner
+# 3
+# 1.4142135623730951
+```
+
+Errors are written to standard error.
+The exit status is 0 on success, 1 if an expression fails, and 2 for an unknown option.
+
 ## Development
 
 CI runs the checks below on every pull request.
