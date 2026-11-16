@@ -1,12 +1,14 @@
 # Changelog
 
-## Unreleased
+## 2.1.0 (2026-11-16)
 
 - REPL: added the `-h`/`--help` and `-V`/`--version` options.
   Any other argument is now reported as an error (exit code 2) instead of being ignored.
 - REPL: a line that is not valid UTF-8 is reported as an error instead of stopping the REPL.
 - REPL: blank lines are ignored instead of reporting `No result.`
 - REPL: the prompt line is ended when the input ends (Ctrl-D), so the shell prompt starts on a new line.
+- Releases: pushing a version tag now also creates a GitHub release,
+  with the version's CHANGELOG entry as the release notes.
 
 ## 2.0.2 (2026-11-02)
 
