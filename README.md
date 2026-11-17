@@ -10,7 +10,9 @@ by using the function `rpn_reckoner::eval(expression: &str) -> Result<f64, rpn_r
 This function takes an RPN expression as a string argument and returns a result,  
 either the evaluated value as a float or an `rpn_reckoner::Error`.
 
-- Operators: `+`, `-`, `*`, `/`, `%`, `^` (or `**`) and `!` (factorial).
+- Binary operators: `+`, `-`, `*`, `/`, `%` and `^` (or `**`).
+- Unary operators: `!` (factorial), `sqrt` (square root), `abs` (absolute value) and `neg` (negation).
+  They apply to the value on top of the stack, so `9 sqrt 1 +` is `4`.
   - `%` is the remainder of truncated division, so its sign follows the dividend (`-7 3 %` is `-1`).
   - `^` and `**` are real-number powers (`2 -2 ^` is `0.25`).
 - Numbers are anything Rust's `f64` parser accepts, such as `-3`, `2.5`, `.5` and `1e3`.
@@ -75,7 +77,7 @@ rpn-reckoner
 Alternatively, clone this repository and run the command `cargo run` in the terminal.
 
 ```bash
-git clone https://github.com/Rei-Ashine/rpn-reckoner.git
+git clone https://github.com/rei-ashine/rpn-reckoner.git
 cd rpn-reckoner
 cargo run
 ```
@@ -104,6 +106,28 @@ An example session (the start-up banner is omitted):
 
 🚀 RPN > q
 ```
+
+### Command line and pipes
+
+Give an expression as arguments to evaluate it once.
+Quote it so that the shell does not expand `*`:
+
+```bash
+rpn-reckoner '3 4 *'        # -> 12
+rpn-reckoner 9 sqrt 1 +     # -> 4
+```
+
+When the input is not a terminal, each line is evaluated
+and printed as one result per line, without the banner and prompt:
+
+```bash
+printf '1 2 +\n2 sqrt\n' | rpn-reckoner
+# 3
+# 1.4142135623730951
+```
+
+Errors are written to standard error.
+The exit status is 0 on success, 1 if an expression fails, and 2 for an unknown option.
 
 ## Development
 
@@ -195,8 +219,6 @@ using the version's `CHANGELOG.md` entry as the release notes.
 
 - [『高効率言語 Rust 書きかた・作りかた』](https://www.socym.co.jp/book/1351)
 
-![ref1](https://www.socym.co.jp/wp-content/uploads/2022/120Px_syoei-1.jpg)
-
 ## License
 
-- [MIT](https://github.com/Rei-Ashine/rpn-reckoner/blob/main/LICENSE)
+- [MIT](https://github.com/rei-ashine/rpn-reckoner/blob/main/LICENSE)

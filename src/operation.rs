@@ -12,6 +12,18 @@ pub fn binary_operator(token: &str) -> Option<fn(f64, f64) -> f64> {
     Some(operator)
 }
 
+/// Returns the function for a unary operator token other than `!`,
+/// or `None` if the token is not one
+pub fn unary_operator(token: &str) -> Option<fn(f64) -> f64> {
+    let operator: fn(f64) -> f64 = match token {
+        "sqrt" => f64::sqrt,
+        "abs" => f64::abs,
+        "neg" => |value| -value,
+        _ => return None,
+    };
+    Some(operator)
+}
+
 /// Returns `n!` if `n` is a non-negative integer, or `None` otherwise.
 ///
 /// Results above `170!` do not fit in an `f64` and are returned as infinity.
@@ -24,8 +36,14 @@ pub fn factorial(n: f64) -> Option<f64> {
         return Some(f64::INFINITY);
     }
 
-    let n = n as u64;
-    Some((1..=n).fold(1.0, |acc, value| acc * value as f64))
+    // Multiply in f64 directly: every factor up to 170 is exact, and no casts are needed
+    let mut result = 1.0;
+    let mut factor = 2.0;
+    while factor <= n {
+        result *= factor;
+        factor += 1.0;
+    }
+    Some(result)
 }
 
 #[cfg(test)]
@@ -38,7 +56,7 @@ mod tests {
         assert_eq!(factorial(-0.0), Some(1.0));
         assert_eq!(factorial(1.0), Some(1.0));
         assert_eq!(factorial(5.0), Some(120.0));
-        assert_eq!(factorial(10.0), Some(3628800.0));
+        assert_eq!(factorial(10.0), Some(3_628_800.0));
         assert_eq!(factorial(171.0), Some(f64::INFINITY));
 
         assert_eq!(factorial(2.5), None);
