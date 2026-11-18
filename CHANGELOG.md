@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.2.0 (2026-11-18)
 
 - Added the unary operators `sqrt` (square root), `abs` (absolute value) and `neg` (negation).
   `-1 sqrt` is an error, like every other result that is not finite.
