@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Command line: closing the output early (for example `| head -1`) now ends the program quietly.
+  Previously it panicked, or printed `Error: Os { ... kind: BrokenPipe ... }`.
+- Command line: an argument that is not valid UTF-8 is reported as an error (exit status 2)
+  instead of a panic.
+- Command line: input and output errors are reported as `rpn-reckoner: <message>`
+  instead of Rust's debug format.
+- Added end-to-end tests that run the binary (`tests/cli.rs`).
+
 ## 2.2.0 (2026-11-18)
 
 - Added the unary operators `sqrt` (square root), `abs` (absolute value) and `neg` (negation).
