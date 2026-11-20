@@ -21,6 +21,25 @@ Options:
 
 Exit status: 0 on success, 1 if an expression fails, 2 for an unknown option.";
 
+// ASCII art in the colossal figlet font
+const BANNER: &str = r#"
+#########################################
+#### Reverse Polish Notation Reckoner ###
+#########################################
+
+8888888b.      8888888b.      888b    888
+888   Y88b     888   Y88b     8888b   888
+888    888     888    888     88888b  888
+888   d88P     888   d88P     888Y88b 888
+8888888P"      8888888P"      888 Y88b888
+888 T88b       888            888  Y88888
+888  T88b      888            888   Y8888
+888   T88b     888            888    Y888
+
+#########################################
+Type: q, quit or exit<Enter> (or Ctrl-D) to leave.
+"#;
+
 /// What the command-line arguments ask the program to do
 #[derive(Debug, PartialEq)]
 enum Command {
@@ -55,39 +74,69 @@ fn parse_args(args: &[String]) -> Command {
     }
 }
 
-fn main() -> io::Result<ExitCode> {
-    let args: Vec<String> = std::env::args().skip(1).collect();
+fn main() -> ExitCode {
+    match run() {
+        Ok(code) => code,
+        // The reader of the output went away (e.g. `| head`): stop quietly
+        Err(error) if error.kind() == io::ErrorKind::BrokenPipe => ExitCode::SUCCESS,
+        Err(error) => {
+            let _ = writeln!(io::stderr(), "rpn-reckoner: {error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+/// Runs the program; output and input errors are returned instead of panicking
+fn run() -> io::Result<ExitCode> {
+    let mut stdout = io::stdout();
+    let mut stderr = io::stderr();
+
+    let args: Result<Vec<String>, _> = std::env::args_os()
+        .skip(1)
+        .map(std::ffi::OsString::into_string)
+        .collect();
+    let args = match args {
+        Ok(args) => args,
+        Err(arg) => {
+            writeln!(stderr, "rpn-reckoner: argument is not valid UTF-8: {arg:?}")?;
+            return Ok(ExitCode::from(2));
+        }
+    };
+
     match parse_args(&args) {
         Command::Lines => {}
         Command::Help => {
-            println!("{USAGE}");
+            writeln!(stdout, "{USAGE}")?;
             return Ok(ExitCode::SUCCESS);
         }
         Command::Version => {
-            println!("rpn-reckoner {}", env!("CARGO_PKG_VERSION"));
+            writeln!(stdout, "rpn-reckoner {}", env!("CARGO_PKG_VERSION"))?;
             return Ok(ExitCode::SUCCESS);
         }
         Command::Eval(expression) => {
             return Ok(match rpn_reckoner::eval(&expression) {
                 Ok(value) => {
-                    println!("{}", format_number(value));
+                    writeln!(stdout, "{}", format_number(value))?;
                     ExitCode::SUCCESS
                 }
                 Err(error) => {
-                    eprintln!("rpn-reckoner: {error}");
+                    writeln!(stderr, "rpn-reckoner: {error}")?;
                     ExitCode::FAILURE
                 }
             });
         }
         Command::Unknown(arg) => {
-            eprintln!("rpn-reckoner: unexpected argument '{arg}'\n\n{USAGE}");
+            writeln!(
+                stderr,
+                "rpn-reckoner: unexpected argument '{arg}'\n\n{USAGE}"
+            )?;
             return Ok(ExitCode::from(2));
         }
     }
 
     let stdin = io::stdin();
     if !stdin.is_terminal() {
-        let ok = eval_lines(&mut stdin.lock(), &mut io::stdout(), &mut io::stderr())?;
+        let ok = eval_lines(&mut stdin.lock(), &mut stdout, &mut stderr)?;
         return Ok(if ok {
             ExitCode::SUCCESS
         } else {
@@ -95,28 +144,8 @@ fn main() -> io::Result<ExitCode> {
         });
     }
 
-    println!();
-    println!("#########################################");
-    println!("#### Reverse Polish Notation Reckoner ###");
-    println!("#########################################");
-    println!();
-
-    // ASCII art (Font: colossal)
-    println!("8888888b.      8888888b.      888b    888");
-    println!("888   Y88b     888   Y88b     8888b   888");
-    println!("888    888     888    888     88888b  888");
-    println!("888   d88P     888   d88P     888Y88b 888");
-    println!("8888888P\"      8888888P\"      888 Y88b888");
-    println!("888 T88b       888            888  Y88888");
-    println!("888  T88b      888            888   Y8888");
-    println!("888   T88b     888            888    Y888");
-    println!();
-
-    println!("#########################################");
-    println!("Type: q, quit or exit<Enter> (or Ctrl-D) to leave.");
-    println!();
-
-    repl(&mut io::stdin().lock(), &mut io::stdout())?;
+    writeln!(stdout, "{BANNER}")?;
+    repl(&mut stdin.lock(), &mut stdout)?;
     Ok(ExitCode::SUCCESS)
 }
 
