@@ -128,6 +128,7 @@ printf '1 2 +\n2 sqrt\n' | rpn-reckoner
 
 Errors are written to standard error.
 The exit status is 0 on success, 1 if an expression fails, and 2 for an unknown option.
+If the output is closed early (for example by `| head -1`), the program stops quietly.
 
 ## Development
 
@@ -207,12 +208,14 @@ using the version's `CHANGELOG.md` entry as the release notes.
 ├── CHANGELOG.md
 ├── Cargo.toml
 ├── LICENSE
-└── src
-    ├── error.rs
-    ├── lib.rs
-    ├── main.rs
-    ├── operation.rs
-    └── test.rs
+├── src
+│   ├── error.rs
+│   ├── lib.rs
+│   ├── main.rs
+│   ├── operation.rs
+│   └── test.rs
+└── tests
+    └── cli.rs
 ```
 
 ## Reference
